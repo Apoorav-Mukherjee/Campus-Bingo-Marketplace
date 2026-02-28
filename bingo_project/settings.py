@@ -117,28 +117,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ─────────────────────────────────────────────
-# STATIC FILES — WhiteNoise serves these
-# ─────────────────────────────────────────────
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'       # collectstatic output
-
-# ─────────────────────────────────────────────
-# STORAGE BACKENDS
-# Static  → WhiteNoise (local compressed files)
-# Media   → Cloudinary (uploaded images/files)
-# ─────────────────────────────────────────────
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-    "default": {
-        # All ImageField / FileField uploads go to Cloudinary
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-}
-
 # Static files
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
