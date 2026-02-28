@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}My Listings - Bingo{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">My Listings</h4>
+        <small class="text-muted">
+            {{ total_count }} total &middot;
+            {{ active_count }} active &middot;
+            {{ sold_count }} sold
+        </small>
+    </div>
+    <a href="{% url 'marketplace:product_create' %}" class="btn btn-orange">
+        <i class="bi bi-plus-lg"></i> Post New Listing
+    </a>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" id="listingTabs">
+    <li class="nav-item">
+        <a class="nav-link active fw-semibold" data-bs-toggle="tab" href="#active-tab">
+            Active <span class="badge bg-success ms-1">{{ active_count }}</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link fw-semibold" data-bs-toggle="tab" href="#sold-tab">
+            Sold <span class="badge bg-danger ms-1">{{ sold_count }}</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link fw-semibold" data-bs-toggle="tab" href="#all-tab">
+            All <span class="badge bg-secondary ms-1">{{ total_count }}</span>
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- Active Tab -->
+    <div class="tab-pane fade show active" id="active-tab">
+        {% include 'marketplace/_listings_table.html' with listings=active_listings empty_msg="You have no active listings." %}
+    </div>
+    <!-- Sold Tab -->
+    <div class="tab-pane fade" id="sold-tab">
+        {% include 'marketplace/_listings_table.html' with listings=sold_listings empty_msg="No sold listings yet." %}
+    </div>
+    <!-- All Tab -->
+    <div class="tab-pane fade" id="all-tab">
+        {% include 'marketplace/_listings_table.html' with listings=all_listings empty_msg="You haven't posted anything yet." %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .btn-orange { background-color: #fd7e14; border-color: #fd7e14; color: white; }
+    .btn-orange:hover { background-color: #e8690a; color: white; }
+    .nav-tabs .nav-link { color: #555; }
+    .nav-tabs .nav-link.active { color: #fd7e14; border-bottom-color: #fd7e14; font-weight: 600; }
+</style>
+{% endblock %}

@@ -1,0 +1,45 @@
+databases:
+  - name: bingo-db
+    plan: free
+    databaseName: bingo_db
+    user: bingo_user
+
+services:
+  - type: web
+    name: bingo-campus
+    plan: free
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn bingo_project.wsgi:application --bind 0.0.0.0:$PORT"
+    healthCheckPath: /
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bingo-db
+          property: connectionString
+
+      - key: RENDER
+        value: true
+
+      - key: PYTHON_VERSION
+        value: "3.13.1"
+
+      # ── Cloudinary ──────────────────────────────
+      # sync: false = Render creates the slot but
+      # you paste the values manually in the dashboard
+      # keeping secrets OUT of your git repository
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+
+      - key: CLOUDINARY_API_KEY
+        sync: false
+
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+
+      # ── App config ──────────────────────────────
+      - key: ALLOWED_EMAIL_DOMAINS
+        value: ""

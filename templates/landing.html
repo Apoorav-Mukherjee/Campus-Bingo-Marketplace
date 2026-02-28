@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% block title %}Bingo - Campus Marketplace{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════ HERO ═══════════ -->
+<div class="rounded-4 p-5 mb-5 text-center text-white"
+     style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 340px;
+            display:flex; flex-direction:column;
+            align-items:center; justify-content:center;">
+    <div class="mb-3" style="font-size:3.5rem;">🛒</div>
+    <h1 class="fw-black mb-2" style="font-size:2.8rem; letter-spacing:-1px;">
+        Your Campus. Your Marketplace.
+    </h1>
+    <p class="lead text-white-50 mb-4" style="max-width:520px;">
+        Buy and sell textbooks, electronics, furniture and more —
+        exclusively with verified students at your college.
+    </p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+        <a href="{% url 'accounts:register' %}"
+           class="btn btn-orange btn-lg px-5 fw-bold">
+            Get Started Free
+        </a>
+        <a href="{% url 'marketplace:product_list' %}"
+           class="btn btn-outline-light btn-lg px-4">
+            Browse Listings
+        </a>
+    </div>
+</div>
+
+<!-- ═══════════ HOW IT WORKS ═══════════ -->
+<div class="text-center mb-5">
+    <h2 class="fw-bold mb-1">How Bingo Works</h2>
+    <p class="text-muted mb-4">Three simple steps to buy or sell on campus</p>
+    <div class="row g-4 justify-content-center">
+        {% for step in steps %}{% endfor %}
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 p-3">
+                <div class="card-body text-center">
+                    <div class="mb-3"
+                         style="font-size:2.5rem;
+                                background:#fff3e0;
+                                width:70px;height:70px;
+                                border-radius:50%;
+                                display:flex;align-items:center;
+                                justify-content:center;margin:0 auto;">
+                        🎓
+                    </div>
+                    <h5 class="fw-bold">Sign Up with College Email</h5>
+                    <p class="text-muted small">
+                        Only verified students can join.
+                        Use your official college email to register.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 p-3">
+                <div class="card-body text-center">
+                    <div class="mb-3"
+                         style="font-size:2.5rem;
+                                background:#e8f5e9;
+                                width:70px;height:70px;
+                                border-radius:50%;
+                                display:flex;align-items:center;
+                                justify-content:center;margin:0 auto;">
+                        📦
+                    </div>
+                    <h5 class="fw-bold">Post or Browse Listings</h5>
+                    <p class="text-muted small">
+                        Sell your old stuff or find great deals
+                        from fellow students on campus.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 p-3">
+                <div class="card-body text-center">
+                    <div class="mb-3"
+                         style="font-size:2.5rem;
+                                background:#e3f2fd;
+                                width:70px;height:70px;
+                                border-radius:50%;
+                                display:flex;align-items:center;
+                                justify-content:center;margin:0 auto;">
+                        💬
+                    </div>
+                    <h5 class="fw-bold">Chat & Meet on Campus</h5>
+                    <p class="text-muted small">
+                        Message sellers directly, agree on a
+                        pickup spot and seal the deal safely.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ CATEGORIES ═══════════ -->
+{% if categories %}
+<div class="mb-5">
+    <h2 class="fw-bold text-center mb-4">Browse by Category</h2>
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3 justify-content-center">
+        {% for cat in categories %}
+        <div class="col">
+            <a href="{% url 'marketplace:product_list' %}?category={{ cat.slug }}"
+               class="card border-0 shadow-sm text-decoration-none text-dark
+                      text-center p-3 h-100 category-card">
+                <div style="font-size:2rem;">
+                    {% if cat.icon %}
+                        <i class="bi {{ cat.icon }} text-warning"></i>
+                    {% else %}
+                        📁
+                    {% endif %}
+                </div>
+                <div class="fw-semibold mt-1">{{ cat.name }}</div>
+                <small class="text-muted">
+                    {{ cat.product_count }} listing{{ cat.product_count|pluralize }}
+                </small>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- ═══════════ RECENT LISTINGS PREVIEW ═══════════ -->
+{% if recent_products %}
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold mb-0">Recent Listings</h2>
+        <a href="{% url 'marketplace:product_list' %}"
+           class="btn btn-outline-dark btn-sm">
+            View All <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
+        {% for product in recent_products %}
+        <div class="col">
+            <a href="{% url 'accounts:register' %}"
+               class="card border-0 shadow-sm text-decoration-none text-dark h-100 product-card">
+                {% with product.get_primary_image as img %}
+                    {% if img %}
+                        <img src="{{ img.image.url }}"
+                             class="card-img-top"
+                             style="height:120px;object-fit:cover;">
+                    {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center"
+                             style="height:120px;">
+                            <i class="bi bi-image text-muted"></i>
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                <div class="card-body p-2">
+                    <div class="small fw-semibold lh-sm">
+                        {{ product.title|truncatechars:30 }}
+                    </div>
+                    <div class="text-success fw-bold small">${{ product.price }}</div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    <!-- Blur overlay nudging guests to sign up -->
+    <div class="text-center mt-3">
+        <p class="text-muted small">
+            <i class="bi bi-lock me-1"></i>
+            Sign up to see full listings and contact sellers
+        </p>
+    </div>
+</div>
+{% endif %}
+
+<!-- ═══════════ CTA BANNER ═══════════ -->
+<div class="rounded-4 text-center p-5"
+     style="background:linear-gradient(135deg,#fd7e14,#e8690a);">
+    <h3 class="fw-black text-white mb-2">Ready to declutter or find a deal?</h3>
+    <p class="text-white-50 mb-4">
+        Join hundreds of students already buying and selling on campus.
+    </p>
+    <a href="{% url 'accounts:register' %}"
+       class="btn btn-light btn-lg fw-bold px-5">
+        Join Bingo Now 🚀
+    </a>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .btn-orange { background-color:#fd7e14; border-color:#fd7e14; color:white; }
+    .btn-orange:hover { background-color:#e8690a; color:white; }
+    .category-card {
+        border-radius: 12px !important;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .category-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+    }
+    .product-card {
+        border-radius: 10px !important;
+        overflow: hidden;
+        transition: transform 0.15s ease;
+    }
+    .product-card:hover { transform: translateY(-3px); }
+</style>
+{% endblock %}

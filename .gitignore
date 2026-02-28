@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+
+# Virtual Environment
+venv/
+env/
+.env/
+.venv/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# Render
+.render-buildpacks.json
+```
+
+---
+
+## Step 6 — Verify `requirements.txt`
+
+Your `requirements.txt` should now include these after running `pip freeze`:
+```
+Django==5.0.6
+Pillow==10.3.0
+gunicorn==21.2.0
+whitenoise==6.7.0
+psycopg2-binary==2.9.9
+dj-database-url==2.2.0

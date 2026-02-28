@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.title }} - Bingo{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+    <!-- LEFT: Images -->
+    <div class="col-md-6">
+        {% with images=product.images.all %}
+            {% if images %}
+                <!-- Main Image -->
+                <div class="mb-2">
+                    <img src="{{ images.0.image.url }}"
+                         class="img-fluid rounded shadow-sm w-100"
+                         style="max-height:400px; object-fit:cover;"
+                         id="mainImage"
+                         alt="{{ product.title }}">
+                </div>
+                <!-- Thumbnails -->
+                {% if images|length > 1 %}
+                    <div class="d-flex gap-2 flex-wrap">
+                        {% for img in images %}
+                            <img src="{{ img.image.url }}"
+                                 class="rounded border thumbnail-img"
+                                 style="width:70px; height:70px; object-fit:cover; cursor:pointer;"
+                                 onclick="document.getElementById('mainImage').src=this.src"
+                                 alt="Image {{ forloop.counter }}">
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                     style="height:350px;">
+                    <i class="bi bi-image text-muted" style="font-size:5rem;"></i>
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- RIGHT: Details -->
+    <div class="col-md-6">
+
+        <!-- Category -->
+        {% if product.category %}
+            <a href="{{ product.category.get_absolute_url }}"
+               class="badge bg-warning text-dark text-decoration-none mb-2 fs-6">
+                {{ product.category.name }}
+            </a>
+        {% endif %}
+
+        <!-- Title & Sold Badge -->
+        <h2 class="fw-bold">
+            {{ product.title }}
+            {% if product.is_sold %}
+                <span class="badge bg-danger ms-2 fs-6">SOLD</span>
+            {% endif %}
+        </h2>
+
+        <!-- Price -->
+        <h3 class="text-success fw-bold">${{ product.price }}</h3>
+
+        <!-- Condition & Location -->
+        <div class="d-flex gap-3 mb-3 text-muted">
+            <span><i class="bi bi-star"></i> {{ product.get_condition_display }}</span>
+            {% if product.location %}
+                <span><i class="bi bi-geo-alt"></i> {{ product.location }}</span>
+            {% endif %}
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4">
+            <h6 class="fw-bold">Description</h6>
+            <p class="text-muted" style="white-space: pre-line;">{{ product.description }}</p>
+        </div>
+
+        <!-- Seller Info -->
+        <div class="card border-0 bg-light p-3 mb-4 rounded">
+            <div class="d-flex align-items-center gap-3">
+                {% if product.seller.profile_picture %}
+                    <img src="{{ product.seller.profile_picture.url }}"
+                         class="rounded-circle"
+                         width="45" height="45"
+                         style="object-fit:cover;">
+                {% else %}
+                    <div class="rounded-circle bg-warning d-flex align-items-center justify-content-center"
+                         style="width:45px;height:45px;font-size:1.2rem;">
+                        {{ product.seller.first_name|first|upper }}
+                    </div>
+                {% endif %}
+                <div>
+                    <div class="fw-semibold">{{ product.seller.get_full_name }}</div>
+                    <small class="text-muted">
+                        {% if product.seller.college_name %}
+                            {{ product.seller.college_name }}
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Posted Date -->
+        <p class="text-muted small mb-4">
+            <i class="bi bi-clock"></i> Posted {{ product.created_at|timesince }} ago
+        </p>
+
+        <!-- Action Buttons -->
+        {% if is_seller %}
+            <!-- Seller Actions -->
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'marketplace:product_edit' product.pk %}"
+                   class="btn btn-outline-primary">
+                    <i class="bi bi-pencil"></i> Edit Listing
+                </a>
+
+                <!-- Mark as Sold Toggle -->
+                <form method="POST" action="{% url 'marketplace:mark_as_sold' product.pk %}">
+                    {% csrf_token %}
+                    {% if product.is_sold %}
+                        <button type="submit" class="btn btn-outline-success">
+                            <i class="bi bi-arrow-counterclockwise"></i> Mark as Available
+                        </button>
+                    {% else %}
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-check-circle"></i> Mark as Sold
+                        </button>
+                    {% endif %}
+                </form>
+
+                <a href="{% url 'marketplace:product_delete' product.pk %}"
+                   class="btn btn-outline-danger">
+                    <i class="bi bi-trash"></i> Delete
+                </a>
+            </div>
+
+        {% elif user.is_authenticated %}
+            {% if not product.is_sold %}
+                <!-- Buyer Action: Chat (Step 6) -->
+                <a href="{% url 'chat:start_chat' product.pk %}"
+                   class="btn btn-primary btn-lg w-100">
+                    <i class="bi bi-chat-dots"></i> Message Seller
+                </a>
+            {% else %}
+                <button class="btn btn-secondary btn-lg w-100" disabled>
+                    This item has been sold
+                </button>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg w-100">
+                <i class="bi bi-box-arrow-in-right"></i> Login to Contact Seller
+            </a>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

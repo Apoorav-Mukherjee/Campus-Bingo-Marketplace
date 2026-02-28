@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% block title %}Messages - Bingo{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold mb-0">
+                    <i class="bi bi-chat-dots-fill text-warning me-2"></i>Messages
+                </h4>
+                {% if total_unread > 0 %}
+                    <small class="text-muted">
+                        {{ total_unread }} unread message{{ total_unread|pluralize }}
+                    </small>
+                {% else %}
+                    <small class="text-muted">All caught up!</small>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Conversation List -->
+        {% if has_conversations %}
+            <div class="d-flex flex-column gap-3">
+                {% for item in rooms_data %}
+                <a href="{% url 'chat:chat_room' item.room.pk %}"
+                   class="text-decoration-none">
+                    <div class="card border-0 shadow-sm conversation-card
+                                {% if item.unread_count > 0 %}unread{% endif %}">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center g-3">
+
+                                <!-- Product Thumbnail -->
+                                <div class="col-auto">
+                                    {% with item.room.product.get_primary_image as img %}
+                                        {% if img %}
+                                            <img src="{{ img.image.url }}"
+                                                 class="rounded"
+                                                 style="width:55px;height:55px;object-fit:cover;">
+                                        {% else %}
+                                            <div class="rounded bg-light d-flex align-items-center
+                                                        justify-content-center"
+                                                 style="width:55px;height:55px;">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+
+                                <!-- Conversation Info -->
+                                <div class="col">
+                                    <!-- Other user + product -->
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="fw-semibold text-dark">
+                                                {{ item.other_user.get_full_name|default:item.other_user.username }}
+                                            </div>
+                                            <small class="text-muted">
+                                                <i class="bi bi-tag me-1"></i>
+                                                {{ item.room.product.title|truncatechars:40 }}
+                                                <!-- Role badge -->
+                                                {% if item.room.buyer == request.user %}
+                                                    <span class="badge bg-info text-dark ms-1"
+                                                          style="font-size:9px;">Buying</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark ms-1"
+                                                          style="font-size:9px;">Selling</span>
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                        <!-- Time + unread badge -->
+                                        <div class="text-end ms-2">
+                                            {% if item.last_message %}
+                                                <small class="text-muted d-block">
+                                                    {{ item.last_message.created_at|timesince }} ago
+                                                </small>
+                                            {% endif %}
+                                            {% if item.unread_count > 0 %}
+                                                <span class="badge bg-danger rounded-pill">
+                                                    {{ item.unread_count }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Last message preview -->
+                                    {% if item.last_message %}
+                                        <p class="mb-0 mt-1 small
+                                                  {% if item.unread_count > 0 %}
+                                                      fw-semibold text-dark
+                                                  {% else %}
+                                                      text-muted
+                                                  {% endif %}"
+                                           style="white-space:nowrap;
+                                                  overflow:hidden;
+                                                  text-overflow:ellipsis;
+                                                  max-width:400px;">
+                                            {% if item.last_message.sender == request.user %}
+                                                <span class="text-muted">You: </span>
+                                            {% endif %}
+                                            {{ item.last_message.body|truncatechars:60 }}
+                                        </p>
+                                    {% else %}
+                                        <p class="mb-0 mt-1 small text-muted fst-italic">
+                                            No messages yet — say hello!
+                                        </p>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-5 bg-white rounded shadow-sm">
+                <i class="bi bi-chat-square-dots text-muted" style="font-size:4rem;"></i>
+                <h5 class="mt-3 fw-bold">No conversations yet</h5>
+                <p class="text-muted">
+                    Browse listings and tap "Message Seller" to start chatting.
+                </p>
+                <a href="{% url 'marketplace:product_list' %}" class="btn btn-orange mt-1">
+                    Browse Listings
+                </a>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .btn-orange { background-color: #fd7e14; border-color: #fd7e14; color: white; }
+    .btn-orange:hover { background-color: #e8690a; color: white; }
+    .conversation-card {
+        border-radius: 12px !important;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        border-left: 4px solid transparent !important;
+    }
+    .conversation-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1) !important;
+    }
+    .conversation-card.unread {
+        border-left: 4px solid #fd7e14 !important;
+        background-color: #fffdf9;
+    }
+</style>
+{% endblock %}

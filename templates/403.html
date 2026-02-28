@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Access Denied - Bingo{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+    <div style="font-size:5rem;">🚫</div>
+    <h1 class="fw-black display-4">403</h1>
+    <h4 class="text-muted mb-3">Access Denied</h4>
+    <p class="text-muted mb-4">
+        You don't have permission to view this page.
+    </p>
+    <a href="{% url 'marketplace:landing' %}" class="btn btn-orange btn-lg px-5">
+        Back to Home
+    </a>
+</div>
+{% endblock %}
+{% block extra_css %}
+<style>.btn-orange{background-color:#fd7e14;border-color:#fd7e14;color:white;}</style>
+{% endblock %}
