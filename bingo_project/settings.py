@@ -12,12 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
-import dj_database_url
-from dotenv import load_dotenv
 
-
-# Load .env file for local development
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,49 +21,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    'SECRET_KEY',
-    default='django-insecure-bingo-local-dev-key-change-me'
-)
 SECRET_KEY = 'django-insecure-e-u^rt2c1i(!0yhf3o*0z8_u-kxqp)qiohwib%%12b!3mls(c@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# ─────────────────────────────────────────────
-# DEBUG — False on Render, True locally
-# ─────────────────────────────────────────────
-RENDER = os.environ.get('RENDER', False)
-DEBUG = not RENDER
+
+DEBUG = True
 
 # ─────────────────────────────────────────────
 # ALLOWED HOSTS
 # ─────────────────────────────────────────────
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+ALLOWED_HOSTS = ['*']
 
 # ─────────────────────────────────────────────
-# CSRF TRUSTED ORIGINS (required for Render)
-# ─────────────────────────────────────────────
-CSRF_TRUSTED_ORIGINS = []
-if RENDER_EXTERNAL_HOSTNAME:
-    CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
 
-# ─────────────────────────────────────────────
-# INSTALLED APPS
-# cloudinary_storage MUST come before staticfiles
-# ─────────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
-    'cloudinary_storage',           # ← BEFORE staticfiles
+    'django.contrib.messages',         
     'django.contrib.staticfiles',
-    'cloudinary',                   # ← Cloudinary SDK
+
     'accounts',
     'marketplace',
     'chat',
@@ -76,7 +49,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -111,12 +83,12 @@ WSGI_APPLICATION = 'bingo_project.wsgi.application'
 # Uses PostgreSQL on Render via DATABASE_URL
 # Falls back to SQLite locally
 # ─────────────────────────────────────────────
+# SQLite for local development
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 # Custom User Model — must be set before first migration
@@ -167,35 +139,21 @@ STORAGES = {
     },
 }
 
-# ─────────────────────────────────────────────
-# MEDIA FILES — stored on Render Disk
-# ─────────────────────────────────────────────
+# Static files
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# Media files (product images, profile pictures)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.environ.get('MEDIA_ROOT', str(BASE_DIR / 'media'))
-
-# ─────────────────────────────────────────────
-# CLOUDINARY CONFIGURATION
-# Reads from .env locally, from Render env vars in production
-# ─────────────────────────────────────────────
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
-    'API_KEY':    os.environ.get('CLOUDINARY_API_KEY', ''),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
-}
-
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ─────────────────────────────────────────────
-# AUTH REDIRECTS
-# ─────────────────────────────────────────────
+# Auth redirects
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-# ─────────────────────────────────────────────
-# COLLEGE EMAIL DOMAINS
-# ─────────────────────────────────────────────
-ALLOWED_EMAIL_DOMAINS = os.environ.get(
-    'ALLOWED_EMAIL_DOMAINS', ''
-).split(',') if os.environ.get('ALLOWED_EMAIL_DOMAINS') else []
+# College email domains
+# Empty list = allow all emails during development
+ALLOWED_EMAIL_DOMAINS = []
