@@ -134,4 +134,4 @@ LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 # College email domains
 # Empty list = allow all emails during development
-ALLOWED_EMAIL_DOMAINS = []
+ALLOWED_EMAIL_DOMAINS = []  
